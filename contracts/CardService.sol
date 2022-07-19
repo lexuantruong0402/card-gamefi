@@ -4,7 +4,7 @@ pragma solidity >=0.8.7;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Item.sol";
 
-contract CardEntity is Ownable, GameItems {
+contract CardService is Ownable, GameItems {
 
     event NewCard(uint _id, uint _dna);
 
@@ -13,22 +13,18 @@ contract CardEntity is Ownable, GameItems {
         _;
     }
 
-    uint dnaDigits = 12;
-    uint dnaMod = 10 ** dnaDigits;
-    uint cooldownTime = 5 minutes;
-    uint randNonce = 0;
-
     mapping (uint => address) public cardBelongTo;
     mapping (address => uint) userCountCard;
 
-    function _random(uint _mod) internal returns (uint) {
-        randNonce++; 
-        return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _mod; 
-    }
 
     function _cardInit(uint8 _amount) external onlyOwner {
         for (uint8 i = 0; i< _amount; i++) 
             _createCard();
+    }
+
+    function _random(uint _mod) internal returns (uint) {
+        randNonce++; 
+        return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _mod; 
     }
 
     function _createCard() internal {
