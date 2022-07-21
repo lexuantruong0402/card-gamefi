@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4; 
+pragma solidity >=0.8.7;
 
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTMarketplace is ERC1155Holder, Ownable {
+contract NftMarket is ERC1155Holder, Ownable {
 
     event MarketItemCreated (uint256 _cardId, uint256 price, address seller, address keeper);
     event ItemCanceled(uint256 _cardId, address seller);
