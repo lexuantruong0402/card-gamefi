@@ -2,8 +2,9 @@
 pragma solidity >=0.8.7;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GameItems is ERC1155 {
+contract GameItems is ERC1155, Ownable {
 
     // egg properties
     uint public constant CommonEgg = 2 ** 10 - 2;
@@ -15,6 +16,8 @@ contract GameItems is ERC1155 {
         uint32 readyTime;
     }
     Card[] public listCard; 
+
+    // master data
     uint dnaDigits = 12;
     uint dnaMod = 10 ** dnaDigits;
     uint cooldownTime = 5 minutes;
