@@ -21,11 +21,12 @@ contract CardBattle is CardService {
     }
 
     function _battle(uint _cardId) external checkCooldown(_cardId) onlyOwnerOfCard(_cardId) returns (uint8, uint8) {
+        IGameItems nft = IGameItems(gameItemAddress);
         uint8 checkWin = uint8(_random(100));
         uint8 checkEgg = uint8(_random(100));
         if (checkWin >= winRate) {
-            if (checkEgg >= rareEggRate) _userMintEgg(CommonEgg);
-            else _userMintEgg(RareEgg);
+            if (checkEgg >= rareEggRate) nft.userMintEgg(msg.sender, nft.getCommonEggId());
+            else nft.userMintEgg(msg.sender, nft.getRareEggId());
         }
         _triggerCooldown(_cardId);
         return (checkWin, checkEgg) ;

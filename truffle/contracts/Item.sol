@@ -7,21 +7,8 @@ import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 contract GameItems is ERC1155, Ownable {
 
     // egg properties
-    uint public constant CommonEgg = 2 ** 10 - 2;
-    uint public constant RareEgg = 2 ** 10 - 3;
-
-    // card properties
-    struct Card {
-        uint dna;
-        uint32 readyTime;
-    }
-    Card[] public listCard; 
-
-    // master data
-    uint dnaDigits = 12;
-    uint dnaMod = 10 ** dnaDigits;
-    uint cooldownTime = 5 minutes;
-    uint randNonce = 0;
+    uint constant CommonEgg = 2 ** 10 - 2;
+    uint constant RareEgg = 2 ** 10 - 3;
 
     constructor() ERC1155("") {}
 
@@ -30,8 +17,23 @@ contract GameItems is ERC1155, Ownable {
         _;
     }
 
-    function _userMintEgg(uint _nftId) internal isEgg(_nftId) {
-        _mint(msg.sender, _nftId, 1, "");
+    function userMintCard(address _sender, uint _id) external {
+        _mint(_sender, _id, 1, "");
     }
 
+    function userMintEgg(address _sender, uint _typeEgg) external {
+        _mint(_sender, _typeEgg, 1, "");
+    }
+
+    function getCommonEggId() external pure returns(uint) {
+        return CommonEgg;
+    }
+
+    function getRareEggId() external pure returns(uint) {
+        return RareEgg;
+    }
+    
+    function userBurnEgg(address _sender, uint _typeEgg, uint _amount) external {
+        _burn(_sender, _typeEgg, _amount);
+    }
 }
