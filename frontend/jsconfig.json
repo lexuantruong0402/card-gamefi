@@ -3,8 +3,7 @@
       "jsx": "react",
       "module": "commonjs",
       "target": "es6",
-      "checkJs": true,
-      "resolveJsonModule": true
+      "checkJs": true
     },
     "exclude": ["node_modules"]
 }

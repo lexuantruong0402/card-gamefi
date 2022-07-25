@@ -1,29 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
-import { Contract_address, Contract_abi } from '../../contracts/CardService.js';
+import { Button } from "react-bootstrap";
 
+async function getAllCardOfUser(userAddress, web3Connect) {
+  const rs = await web3Connect.methods.getAllCardOfUser(userAddress).call();
+  return rs;
+}
 
-function CardService({userAddress, web3Connect }) {
+function CardService({ userAddress, web3Connect }) {
+  const [listCard, setListCard] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
-  const [cardService, setCardService] = useState();
-  const [listCard, setListCard] = useState([]); 
-  
   useEffect(() => {
     async function load() {
-      const cardService = new web3Connect.eth.Contract(Contract_abi, Contract_address);
-      const counter = await cardService.methods.getAllCardOfUser(userAddress).call();
-      setListCard(counter);
+      if (isLoading) {
+        // getAllCardOfUser().then(() => {
+        //   setLoading(false);
+        // });
+        setListCard(await getAllCardOfUser(userAddress, web3Connect));
+        setLoading(false);
+      }
     }
-    
+
     load();
-   }, []);
- 
+  }, [isLoading]);
+
+  const handleClick = () => setLoading(true);
+
   return (
     <>
-      <p>{userAddress}</p>
-      <p>{listCard}</p>
+      <Button
+        variant="primary"
+        disabled={isLoading}
+        onClick={!isLoading ? handleClick : null}
+      >
+        {isLoading ? "Loading…" : "Click to load"}
+      </Button>
+      {JSON.stringify(listCard)}
     </>
   );
 }
 export default CardService;
-  
