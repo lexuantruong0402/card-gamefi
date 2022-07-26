@@ -5,11 +5,19 @@ import "../node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
 interface IGameItems is IERC1155 {
-    function userMintCard(address sender, uint id) external;
-    function userMintEgg(address _sender, uint _typeEgg) external;
-    function getCommonEggId() external pure returns(uint);
-    function getRareEggId() external pure returns(uint);
-    function userBurnEgg(address _sender, uint _typeEgg, uint _amount) external;
+    function userMintCard(address sender, uint256 id) external;
+
+    function userMintEgg(address _sender, uint256 _typeEgg) external;
+
+    function getCommonEggId() external pure returns (uint256);
+
+    function getRareEggId() external pure returns (uint256);
+
+    function userBurnEgg(
+        address _sender,
+        uint256 _typeEgg,
+        uint256 _amount
+    ) external;
 }
 
 interface ICardService {
@@ -17,22 +25,28 @@ interface ICardService {
 }
 
 contract EggService is Ownable {
-
     uint8 amountNeedToOpenCommonEgg = 6;
     uint8 amountNeedToOpenRareEgg = 10;
 
-    address gameItemAddress; 
+    address gameItemAddress;
     address cardServiceAddress;
 
-    modifier checkAmount(uint _eggType) {
+    modifier checkAmount(uint256 _eggType) {
         IGameItems nft = IGameItems(gameItemAddress);
-        uint CommonEggId = nft.getCommonEggId();
-        uint RareEggId = nft.getRareEggId();
-        
-        if (_eggType == CommonEggId) 
-            require(nft.balanceOf(msg.sender, CommonEggId) > amountNeedToOpenCommonEgg, "not enough egg");
-        if (_eggType == RareEggId) 
-            require(nft.balanceOf(msg.sender, RareEggId) > amountNeedToOpenRareEgg, "not enough egg");
+        uint256 CommonEggId = nft.getCommonEggId();
+        uint256 RareEggId = nft.getRareEggId();
+
+        if (_eggType == CommonEggId)
+            require(
+                nft.balanceOf(msg.sender, CommonEggId) >
+                    amountNeedToOpenCommonEgg,
+                "not enough egg"
+            );
+        if (_eggType == RareEggId)
+            require(
+                nft.balanceOf(msg.sender, RareEggId) > amountNeedToOpenRareEgg,
+                "not enough egg"
+            );
         _;
     }
 
@@ -44,14 +58,14 @@ contract EggService is Ownable {
         cardServiceAddress = _address;
     }
 
-    function _openEgg(uint _eggType) external  {
+    function _openEgg(uint256 _eggType) external {
         ICardService card = ICardService(cardServiceAddress);
         IGameItems nft = IGameItems(gameItemAddress);
 
         card._userCreateCard(msg.sender);
-        if (_eggType == nft.getCommonEggId()) 
+        if (_eggType == nft.getCommonEggId())
             nft.userBurnEgg(msg.sender, _eggType, amountNeedToOpenCommonEgg);
-        if (_eggType == nft.getRareEggId()) 
+        if (_eggType == nft.getRareEggId())
             nft.userBurnEgg(msg.sender, _eggType, amountNeedToOpenRareEgg);
     }
 }
