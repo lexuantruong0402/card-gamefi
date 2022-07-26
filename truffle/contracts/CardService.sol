@@ -76,4 +76,23 @@ contract CardService is Ownable {
         emit NewCard(id, dna);
     }
 
+    function getAllCardOfUser(address _sender) external view returns(Card[] memory) {
+        uint count = 0;
+        IGameItems nft = IGameItems(gameItemAddress);
+        for (uint i=0; i<listCard.length; i++) {
+            if (nft.balanceOf(_sender, i) == 1) 
+                count++;
+        }
+
+        Card[] memory results = new Card[](count);
+        count = 0;
+        for (uint i=0; i<listCard.length; i++) {
+            if (nft.balanceOf(_sender, i) == 1) {
+                results[count] = listCard[i];
+                count++;
+            }
+        }
+        return results;
+    }
+
 }
