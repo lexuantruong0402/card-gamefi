@@ -7,6 +7,8 @@ contract CardBattle is CardService {
     uint8 winRate = 50;
     uint8 rareEggRate = 30;
 
+    event FightResult(uint256 cardId, uint8 checkWin, uint8 checkEgg);
+
     modifier checkCooldown(uint256 _cardId) {
         require(listCard[_cardId].readyTime <= block.timestamp, "is cooldown");
         _;
@@ -24,7 +26,6 @@ contract CardBattle is CardService {
         external
         checkCooldown(_cardId)
         onlyOwnerOfCard(_cardId)
-        returns (uint8, uint8)
     {
         IGameItems nft = IGameItems(gameItemAddress);
         uint8 checkWin = uint8(_random(100));
@@ -35,6 +36,6 @@ contract CardBattle is CardService {
             else nft.userMintEgg(msg.sender, nft.getRareEggId());
         }
         _triggerCooldown(_cardId);
-        return (checkWin, checkEgg);
+        emit FightResult(_cardId, checkWin, checkEgg);
     }
 }

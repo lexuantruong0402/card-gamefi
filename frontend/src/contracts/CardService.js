@@ -1,6 +1,31 @@
 export const Contract_address_cardService =
-  "0xef73Dcf0Efc8aec1c4f50B982e61882f14FBaA6D";
+  "0xDc6445F99deA0b50eBEF909a9E5D072ca52E4fB2";
 export const Contract_abi_cardService = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "cardId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "checkWin",
+        type: "uint8",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "checkEgg",
+        type: "uint8",
+      },
+    ],
+    name: "FightResult",
+    type: "event",
+  },
   {
     anonymous: false,
     inputs: [
@@ -48,18 +73,7 @@ export const Contract_abi_cardService = [
       },
     ],
     name: "_battle",
-    outputs: [
-      {
-        internalType: "uint8",
-        name: "",
-        type: "uint8",
-      },
-      {
-        internalType: "uint8",
-        name: "",
-        type: "uint8",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
