@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import Countdown from "react-countdown";
 
@@ -18,13 +18,36 @@ const eyes = 17;
 const mouth = 2;
 const accessories = 12;
 
-const handleFight = async (cardService, idfight, userAddress) => {
+const handleFight = async (
+  cardService,
+  idfight,
+  userAddress,
+  setShow,
+  setWin,
+  setNormalEgg
+) => {
   const response = await cardService.methods
     ._battle(idfight)
     .send({ from: userAddress });
+  const result = response.events.FightResult.returnValues;
+  console.log(result);
+  if (result[1] > 50) {
+    setWin(true);
+    if (result[2] > 30) setNormalEgg(true);
+    else setNormalEgg(false);
+  } else setWin(false);
+  setShow(true);
 };
 
-export default function HandleCard(listCard, cardService, userAddress) {
+export default function HandleCard({ listCard, cardService, userAddress }) {
+  const [show, setShow] = useState(false);
+  const [win, setWin] = useState(false);
+  const [normalEgg, setNormalEgg] = useState(false);
+  const handleClose = () => {
+    setShow(false);
+    window.location.reload();
+  };
+
   return (
     <Container className="d-flex justify-content-center">
       <Row>
@@ -42,35 +65,36 @@ export default function HandleCard(listCard, cardService, userAddress) {
                   position: "relative",
                   margin: "5 5 5 5",
                 }}
+                className="img-nft"
               >
                 <img
                   alt="bg"
-                  className="img-background"
+                  className="img-nft img-background"
                   src={`/images/background/${parts[0] % background}.png`}
                 ></img>
                 <img
                   alt="body"
-                  className="img-body"
+                  className="img-nft img-body"
                   src={`/images/body/${parts[1] % body}.png`}
                 ></img>
                 <img
                   alt="brows"
-                  className="img-brows"
+                  className="img-nft img-brows"
                   src={`/images/brows/${parts[2] % brows}.png`}
                 ></img>
                 <img
                   alt="eyes"
-                  className="img-eyes"
+                  className="img-nft img-eyes"
                   src={`/images/eyes/${parts[3] % eyes}.png`}
                 ></img>
                 <img
                   alt="mouth"
-                  className="img-mouth"
+                  className="img-nft img-mouth"
                   src={`/images/mouth/${parts[4] % mouth}.png`}
                 ></img>
                 <img
                   alt="accessories"
-                  className="img-accessories"
+                  className="img-nft img-accessories"
                   src={`/images/accessories/${parts[5] % accessories}.png`}
                 ></img>
               </div>
@@ -87,26 +111,110 @@ export default function HandleCard(listCard, cardService, userAddress) {
                       marginLeft: "60px",
                     }}
                     onClick={() => {
-                      handleFight(cardService, card[0], userAddress);
+                      handleFight(cardService, card[0], userAddress, setShow);
                     }}
                   >
                     Fight
                   </Button>
                 </Countdown>
               ) : (
-                <Button
-                  variant="outline-danger"
-                  style={{
-                    marginTop: "10px",
-                    marginBottom: "20px",
-                    marginLeft: "60px",
-                  }}
-                  onClick={() => {
-                    handleFight(cardService, card[0], userAddress);
-                  }}
-                >
-                  Fight
-                </Button>
+                <div>
+                  <Button
+                    variant="outline-danger"
+                    style={{
+                      marginTop: "10px",
+                      marginBottom: "20px",
+                      marginLeft: "60px",
+                    }}
+                    onClick={() => {
+                      handleFight(
+                        cardService,
+                        card[0],
+                        userAddress,
+                        setShow,
+                        setWin,
+                        setNormalEgg
+                      );
+                    }}
+                  >
+                    Fight
+                  </Button>
+
+                  <Modal show={show} onHide={handleClose}>
+                    <Modal.Body>
+                      {!win ? (
+                        <>
+                          <img
+                            alt="loss"
+                            style={{
+                              width: "200px",
+                              height: "100px",
+                              marginLeft: "30%",
+                            }}
+                            src={`/winloss/2.png`}
+                          ></img>
+                          <p
+                            style={{
+                              marginLeft: "45%",
+                            }}
+                          >
+                            No Reward
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <img
+                            alt="win"
+                            style={{
+                              width: "200px",
+                              height: "100px",
+                              marginLeft: "30%",
+                            }}
+                            src={`/winloss/1.png`}
+                          ></img>
+                          <p
+                            style={{
+                              marginLeft: "45%",
+                            }}
+                          >
+                            Reward
+                          </p>
+                          {normalEgg ? (
+                            <>
+                              <img
+                                alt="normal egg"
+                                style={{
+                                  width: "200px",
+                                  height: "200px",
+                                  marginLeft: "10%",
+                                }}
+                                src={`/eggs/2.png`}
+                              ></img>
+                              1 Common Egg
+                            </>
+                          ) : (
+                            <>
+                              {" "}
+                              <img
+                                alt="rare egg"
+                                style={{
+                                  width: "200px",
+                                  height: "200px",
+                                  marginLeft: "10%",
+                                }}
+                                src={`/eggs/1.png`}
+                              ></img>
+                              1 Rare Egg
+                            </>
+                          )}
+                        </>
+                      )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button onClick={handleClose}>Confirm</Button>
+                    </Modal.Footer>
+                  </Modal>
+                </div>
               )}
             </Col>
           );

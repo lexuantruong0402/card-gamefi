@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { Modal, Button } from "react-bootstrap";
 import {
   Contract_address_cardService,
   Contract_abi_cardService,
 } from "../../contracts/CardService.js";
 import "./card.css";
+import HandleCard from "./handleCard.js";
 import handleCard from "./handleCard.js";
 
 async function getAllCardOfUser(userAddress, web3Connect) {
@@ -20,7 +22,6 @@ function CardService({ userAddress, web3Connect }) {
       Contract_address_cardService
     )
   );
-  const [modalShow, setModalShow] = useState(false);
 
   useEffect(() => {
     try {
@@ -36,9 +37,15 @@ function CardService({ userAddress, web3Connect }) {
 
   return (
     <>
-      {listCard?.length > 0
-        ? handleCard(listCard, cardService, userAddress)
-        : ""}
+      {listCard?.length > 0 ? (
+        <HandleCard
+          listCard={listCard}
+          cardService={cardService}
+          userAddress={userAddress}
+        ></HandleCard>
+      ) : (
+        ""
+      )}
     </>
   );
 }
