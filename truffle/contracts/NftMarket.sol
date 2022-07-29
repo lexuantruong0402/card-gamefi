@@ -5,7 +5,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holde
 import "../node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-contract NftMarket is ERC1155Holder, Ownable {
+contract NFTMarketplace is ERC1155Holder, Ownable {
     event MarketItemCreated(
         uint256 _cardId,
         uint256 price,
@@ -31,6 +31,7 @@ contract NftMarket is ERC1155Holder, Ownable {
     }
 
     address nftAddress;
+    address cardAddress;
     uint8 fee = 10;
 
     mapping(uint256 => CardMarketItem) public listCardOnMarket;
@@ -59,6 +60,10 @@ contract NftMarket is ERC1155Holder, Ownable {
     }
 
     function _setNftAddress(address _nftAddress) external {
+        nftAddress = _nftAddress;
+    }
+
+    function _setCardAddress(address _nftAddress) external {
         nftAddress = _nftAddress;
     }
 
@@ -126,5 +131,47 @@ contract NftMarket is ERC1155Holder, Ownable {
         nft.safeTransferFrom(address(this), msg.sender, _cardId, 1, "0x0");
         delete (listCardOnMarket[_cardId]);
         emit ItemBought(_cardId, itemOnMarket.seller, msg.sender);
+    }
+
+    function getListCardOfUserOnMarket(address _userAddress, uint256 _totalCard)
+        external
+        view
+        returns (CardMarketItem[] memory)
+    {
+        uint256 count = 0;
+        uint256 j = 0;
+        for (uint256 i = 0; i < _totalCard; i++) {
+            if (listCardOnMarket[i].seller == _userAddress) count++;
+        }
+
+        CardMarketItem[] memory results = new CardMarketItem[](count);
+        for (uint256 i = 0; i < _totalCard; i++) {
+            if (listCardOnMarket[i].seller == _userAddress) {
+                results[j] = listCardOnMarket[i];
+                j++;
+            }
+        }
+        return results;
+    }
+
+    function getListCardOnMarket(uint256 _totalCard)
+        external
+        view
+        returns (CardMarketItem[] memory)
+    {
+        uint256 count = 0;
+        uint256 j = 0;
+        for (uint256 i = 0; i < _totalCard; i++) {
+            if (listCardOnMarket[i].keeper == address(this)) count++;
+        }
+
+        CardMarketItem[] memory results = new CardMarketItem[](count);
+        for (uint256 i = 0; i < _totalCard; i++) {
+            if (listCardOnMarket[i].keeper == address(this)) {
+                results[j] = listCardOnMarket[i];
+                j++;
+            }
+        }
+        return results;
     }
 }

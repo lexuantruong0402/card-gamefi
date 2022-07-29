@@ -5,6 +5,8 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import ShowTab from "./component/Tab/tab";
 import CardService from "./component/Card/card";
+import ShowEgg from "./component/Egg/egg";
+import ShowMarketPlace from "./component/Marketplace/marketplace";
 
 function App() {
   const web3Connect = new Web3(Web3.givenProvider || "http://localhost:7545");
@@ -25,6 +27,16 @@ function App() {
       <ShowTab setTab={setTab}></ShowTab>
       {tab === "card" && account !== "" ? (
         <CardService userAddress={account} web3Connect={web3Connect} />
+      ) : (
+        ""
+      )}
+      {tab === "egg" && account !== "" ? (
+        <ShowEgg userAddress={account} web3Connect={web3Connect} />
+      ) : (
+        ""
+      )}
+      {tab === "marketplace" && account !== "" ? (
+        <ShowMarketPlace userAddress={account} web3Connect={web3Connect} />
       ) : (
         ""
       )}

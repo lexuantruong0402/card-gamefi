@@ -1,5 +1,5 @@
 export const Contract_address_cardService =
-  "0x5CF671C2c05274Ca74C8B41D9d8253B7eFbda9CD";
+  "0x37139A2b14544a90A5Fcc04db7953f25Bab3f355";
 export const Contract_abi_cardService = [
   {
     anonymous: false,
@@ -190,6 +190,55 @@ export const Contract_abi_cardService = [
         internalType: "struct CardService.Card[]",
         name: "",
         type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256[]",
+        name: "_listIds",
+        type: "uint256[]",
+      },
+    ],
+    name: "getInfoCard",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "dna",
+            type: "uint256",
+          },
+          {
+            internalType: "uint32",
+            name: "readyTime",
+            type: "uint32",
+          },
+        ],
+        internalType: "struct CardService.Card[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getTotalCard",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

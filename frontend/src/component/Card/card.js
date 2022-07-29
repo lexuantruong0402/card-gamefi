@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button } from "react-bootstrap";
 import {
   Contract_address_cardService,
   Contract_abi_cardService,
 } from "../../contracts/CardService.js";
+import {
+  Contract_address_marketplace,
+  Contract_abi_marketplace,
+} from "../../contracts/NftMarketplace.js";
 import "./card.css";
 import HandleCard from "./handleCard.js";
-import handleCard from "./handleCard.js";
 
 async function getAllCardOfUser(userAddress, web3Connect) {
   const rs = await web3Connect.methods.getAllCardOfUser(userAddress).call();
@@ -15,12 +17,16 @@ async function getAllCardOfUser(userAddress, web3Connect) {
 
 function CardService({ userAddress, web3Connect }) {
   const [listCard, setListCard] = useState([]);
-  const [cardService, setCardService] = useState(
-    new web3Connect.eth.Contract(
-      // @ts-ignore
-      Contract_abi_cardService,
-      Contract_address_cardService
-    )
+  const cardService = new web3Connect.eth.Contract(
+    // @ts-ignore
+    Contract_abi_cardService,
+    Contract_address_cardService
+  );
+
+  const marketplaceService = new web3Connect.eth.Contract(
+    // @ts-ignore
+    Contract_abi_marketplace,
+    Contract_address_marketplace
   );
 
   useEffect(() => {
@@ -33,7 +39,7 @@ function CardService({ userAddress, web3Connect }) {
     } catch (err) {
       console.log(err);
     }
-  }, [userAddress, cardService]);
+  }, []);
 
   return (
     <>
@@ -42,6 +48,7 @@ function CardService({ userAddress, web3Connect }) {
           listCard={listCard}
           cardService={cardService}
           userAddress={userAddress}
+          marketplaceService={marketplaceService}
         ></HandleCard>
       ) : (
         ""

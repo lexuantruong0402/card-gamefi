@@ -110,4 +110,22 @@ contract CardService is Ownable {
         }
         return results;
     }
+
+    function getTotalCard() external view returns (uint256) {
+        return listCard.length;
+    }
+
+    function getInfoCard(uint256[] memory _listIds)
+        external
+        view
+        returns (Card[] memory)
+    {
+        Card[] memory results = new Card[](_listIds.length);
+        uint256 j = 0;
+        for (uint256 i = 0; i < _listIds.length; i++) {
+            results[j] = listCard[_listIds[i]];
+            j++;
+        }
+        return results;
+    }
 }
