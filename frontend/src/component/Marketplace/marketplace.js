@@ -7,6 +7,10 @@ import {
   Contract_address_cardService,
   Contract_abi_cardService,
 } from "../../contracts/CardService.js";
+import {
+  Contract_address_gameItems,
+  Contract_abi_gameItems,
+} from "../../contracts/GameItems.js";
 
 import "./marketplace.css";
 import HandleCardOfUser from "./handleCardOfUser";
@@ -31,7 +35,6 @@ function coverToObject(infoOnMarket, infoOnCardService) {
 function ShowMarketPlace({ userAddress, web3Connect }) {
   const [infoCardOnMarketOfUser, setInfoCardOnMarketOfUser] = useState([]);
   const [infoCardOnMarket, setInfoCardOnMarket] = useState([]);
-  const [cardsCanBuy, setCardsCanBuy] = useState([]);
 
   const marketplaceService = new web3Connect.eth.Contract(
     // @ts-ignore
@@ -43,39 +46,51 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
     Contract_abi_cardService,
     Contract_address_cardService
   );
+  const gamesItemService = new web3Connect.eth.Contract(
+    // @ts-ignore
+    Contract_abi_gameItems,
+    Contract_address_gameItems
+  );
+
+  const loadMarket = async () => {
+    const listItemOnMarket = await marketplaceService.methods
+      .getListItemOnMarket()
+      .call();
+
+    const listCardOnMarket = listItemOnMarket.filter(
+      (item) => item[0] !== "1022" && item[0] !== "1021"
+    );
+
+    const listCardOnMarketInfo = await cardService.methods
+      .getInfoCard(listCardOnMarket.map((e) => e[0]))
+      .call();
+
+    const listCardOnMarketWithInfo = coverToObject(
+      listCardOnMarket,
+      listCardOnMarketInfo
+    );
+
+    setInfoCardOnMarketOfUser(
+      listCardOnMarketWithInfo.filter((elm) => elm.seller === userAddress)
+    );
+
+    setInfoCardOnMarket(
+      listCardOnMarketWithInfo.filter((elm) => elm.seller !== userAddress)
+    );
+  };
 
   useEffect(() => {
     async function load() {
-      const totalCard = await cardService.methods.getTotalCard().call();
-      const cardsOnMarket = await marketplaceService.methods
-        .getListCardOnMarket(totalCard)
+      const checkApprove = await gamesItemService.methods
+        .isApprovedForAll(userAddress, Contract_address_marketplace)
         .call();
 
-      const getInfoCardMarket = await cardService.methods
-        .getInfoCard(cardsOnMarket.map((e) => e[0][0]))
-        .call();
+      if (!checkApprove)
+        await gamesItemService.methods
+          .setApprovalForAll(Contract_address_marketplace, true)
+          .send({ from: userAddress });
 
-      const cardInfoMarket = coverToObject(cardsOnMarket, getInfoCardMarket);
-      setInfoCardOnMarket(cardInfoMarket);
-
-      const cardsOnMarketOfUser = await marketplaceService.methods
-        .getListCardOfUserOnMarket(userAddress, totalCard)
-        .call();
-
-      const getInfoCardUser = await cardService.methods
-        .getInfoCard(cardsOnMarketOfUser.map((e) => e[0][0]))
-        .call();
-
-      const cardInfoMarketUser = coverToObject(
-        cardsOnMarketOfUser,
-        getInfoCardUser
-      );
-      setInfoCardOnMarketOfUser(cardInfoMarketUser);
-
-      const cardInfoMarketFilter = cardInfoMarket.filter(
-        (e) => !cardInfoMarketUser.map((elm) => elm.id).includes(e.id)
-      );
-      setCardsCanBuy(cardInfoMarketFilter);
+      loadMarket();
     }
 
     load().catch((err) => {
@@ -91,7 +106,7 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
         userAddress={userAddress}
       ></HandleCardOfUser>
       <HandleCardOnMarket
-        infoCardOnMarket={cardsCanBuy}
+        infoCardOnMarket={infoCardOnMarket}
         marketplaceService={marketplaceService}
         userAddress={userAddress}
       ></HandleCardOnMarket>

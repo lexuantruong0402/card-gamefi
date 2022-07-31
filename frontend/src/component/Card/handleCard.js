@@ -294,7 +294,7 @@ export default function HandleCard({
                         variant="primary"
                         onClick={async () => {
                           await marketplaceService.methods
-                            ._sellItem(sellCard, sellPrice)
+                            ._sellItem(sellCard, sellPrice, 1)
                             .send({ from: userAddress });
                           handleClose();
                         }}

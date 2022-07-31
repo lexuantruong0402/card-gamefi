@@ -39,10 +39,12 @@ export default function HandleCardOnMarket({
                 >
                   <Button
                     onClick={async () => {
-                      await marketplaceService.methods._buyItem(card.id).send({
-                        from: userAddress,
-                        value: card.price * 1e18,
-                      });
+                      await marketplaceService.methods
+                        ._buyItem(card.id, 1, card.seller)
+                        .send({
+                          from: userAddress,
+                          value: card.price * 1e18,
+                        });
                       window.location.reload();
                     }}
                   >

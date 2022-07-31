@@ -1,31 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFTMarketplace is ERC1155Holder, Ownable {
     event MarketItemCreated(
-        uint256 _cardId,
+        uint256 id,
         uint256 price,
+        uint256 amount,
         address seller,
         address keeper
     );
-    event ItemCanceled(uint256 _cardId, address seller);
-    event MarketItemUpdated(
-        uint256 _cardId,
-        uint256 oldPrice,
-        uint256 newPrice,
+    event ItemBought(
+        uint256 itemId,
+        uint256 amount,
         address seller,
-        address keeper
+        address buyer
     );
-    event ItemBought(uint256 _cardId, address seller, address buyer);
 
-    struct CardMarketItem {
-        uint256 _cardId;
+    struct MarketItem {
+        uint256 id;
         uint256 price;
-        address nftAddress;
+        uint256 amount;
         address seller;
         address keeper;
     }
@@ -34,28 +32,10 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
     address cardAddress;
     uint8 fee = 10;
 
-    mapping(uint256 => CardMarketItem) public listCardOnMarket;
+    MarketItem[] listItemOnMarket;
 
     modifier checkPrice(uint256 _price) {
         require(_price > 0, "Price must be at least 1 wei");
-        _;
-    }
-
-    modifier checkIsSeller(uint256 _cardId) {
-        require(
-            listCardOnMarket[_cardId].seller == msg.sender,
-            "You are not the seller"
-        );
-        _;
-    }
-
-    modifier checkIsOnMarket(uint256 _cardId) {
-        require(listCardOnMarket[_cardId].price > 0, "Not Listed");
-        _;
-    }
-
-    modifier checkIsNotOnMarket(uint256 _cardId) {
-        require(listCardOnMarket[_cardId].price <= 0, "Listed");
         _;
     }
 
@@ -67,111 +47,139 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         nftAddress = _nftAddress;
     }
 
-    function _sellItem(uint256 _cardId, uint256 _price)
-        external
-        checkPrice(_price)
-        checkIsNotOnMarket(_cardId)
+    function _findItem(uint256 _itemId, address _seller)
+        internal
+        view
+        returns (MarketItem memory, uint256)
     {
+        MarketItem memory middle;
+        uint256 index;
+        for (uint256 i = 0; i < listItemOnMarket.length; i++) {
+            if (
+                listItemOnMarket[i].id == _itemId &&
+                listItemOnMarket[i].seller == _seller
+            ) {
+                middle = listItemOnMarket[i];
+                index = i;
+                break;
+            }
+        }
+        return (middle, index);
+    }
+
+    function _deleteFromListItemOnMarket(uint256 _index) internal {
+        listItemOnMarket[_index] = listItemOnMarket[
+            listItemOnMarket.length - 1
+        ];
+        listItemOnMarket.pop();
+    }
+
+    function _sellItem(
+        uint256 _itemId,
+        uint256 _price,
+        uint256 _amount
+    ) external checkPrice(_price) {
         IERC1155 nft = IERC1155(nftAddress);
-        listCardOnMarket[_cardId] = CardMarketItem(
-            _cardId,
+        listItemOnMarket.push(
+            MarketItem(_itemId, _price, _amount, msg.sender, address(this))
+        );
+        nft.safeTransferFrom(
+            msg.sender,
+            address(this),
+            _itemId,
+            _amount,
+            "0x0"
+        );
+        emit MarketItemCreated(
+            _itemId,
             _price,
-            nftAddress,
+            _amount,
             msg.sender,
             address(this)
         );
-        nft.safeTransferFrom(msg.sender, address(this), _cardId, 1, "0x0");
-        emit MarketItemCreated(_cardId, _price, msg.sender, address(this));
     }
 
-    function _cancelItemListed(uint256 _cardId)
-        external
-        checkIsOnMarket(_cardId)
-        checkIsSeller(_cardId)
-    {
+    function _cancelItemListed(uint256 _itemId) external {
         IERC1155 nft = IERC1155(nftAddress);
-        delete (listCardOnMarket[_cardId]);
-        nft.safeTransferFrom(address(this), msg.sender, _cardId, 1, "0x0");
-        emit ItemCanceled(_cardId, msg.sender);
-    }
-
-    function _updatePrice(uint256 _cardId, uint256 _newPrice)
-        external
-        checkIsOnMarket(_cardId)
-        checkIsSeller(_cardId)
-    {
-        emit MarketItemUpdated(
-            _cardId,
-            listCardOnMarket[_cardId].price,
-            _newPrice,
-            listCardOnMarket[_cardId].seller,
-            listCardOnMarket[_cardId].keeper
+        MarketItem memory middle;
+        uint256 index;
+        (middle, index) = _findItem(_itemId, msg.sender);
+        _deleteFromListItemOnMarket(index);
+        nft.safeTransferFrom(
+            address(this),
+            msg.sender,
+            _itemId,
+            middle.amount,
+            "0x0"
         );
-        listCardOnMarket[_cardId].price = _newPrice;
     }
 
-    function _buyItem(uint256 _cardId)
-        external
-        payable
-        checkIsOnMarket(_cardId)
+    function _update(
+        uint256 _itemId,
+        uint256 _newPrice,
+        uint256 _newAmount
+    ) external // check new amount > 0
     {
         IERC1155 nft = IERC1155(nftAddress);
-        CardMarketItem memory itemOnMarket = listCardOnMarket[_cardId];
-        require(msg.value >= itemOnMarket.price);
+        MarketItem memory middle;
+        uint256 index;
+        (middle, index) = _findItem(_itemId, msg.sender);
+        if (listItemOnMarket[index].amount > _newAmount)
+            nft.safeTransferFrom(
+                address(this),
+                msg.sender,
+                _itemId,
+                middle.amount - _newAmount,
+                "0x0"
+            );
 
-        uint256 _cardPriceToWei = itemOnMarket.price * 1e18;
+        if (listItemOnMarket[index].amount < _newAmount)
+            nft.safeTransferFrom(
+                msg.sender,
+                address(this),
+                _itemId,
+                _newAmount - middle.amount,
+                "0x0"
+            );
+
+        listItemOnMarket[index].amount = _newAmount;
+        listItemOnMarket[index].price = _newPrice;
+    }
+
+    function _buyItem(
+        uint256 _itemId,
+        uint256 _amount,
+        address _seller
+    ) external payable {
+        IERC1155 nft = IERC1155(nftAddress);
+        MarketItem memory middle;
+        uint256 index;
+        (middle, index) = _findItem(_itemId, _seller);
+
+        uint256 _cardPriceToWei = middle.price * 1e18 * _amount;
+        require(msg.value >= _cardPriceToWei);
         uint256 _changeMoney = msg.value - _cardPriceToWei;
         uint256 _ownerEarn = (_cardPriceToWei * fee) / 100;
         uint256 _sellerEarn = _cardPriceToWei - _ownerEarn;
 
         payable(msg.sender).transfer(_changeMoney);
         payable(owner()).transfer(_ownerEarn);
-        payable(itemOnMarket.seller).transfer(_sellerEarn);
+        payable(middle.seller).transfer(_sellerEarn);
 
-        nft.safeTransferFrom(address(this), msg.sender, _cardId, 1, "0x0");
-        delete (listCardOnMarket[_cardId]);
-        emit ItemBought(_cardId, itemOnMarket.seller, msg.sender);
+        nft.safeTransferFrom(
+            address(this),
+            msg.sender,
+            _itemId,
+            _amount,
+            "0x0"
+        );
+        if (_amount == middle.amount) _deleteFromListItemOnMarket(index);
+        else (listItemOnMarket[index].amount = middle.amount - _amount);
+
+        emit ItemBought(_itemId, _amount, middle.seller, msg.sender);
     }
 
-    function getListCardOfUserOnMarket(address _userAddress, uint256 _totalCard)
-        external
-        view
-        returns (CardMarketItem[] memory)
-    {
-        uint256 count = 0;
-        uint256 j = 0;
-        for (uint256 i = 0; i < _totalCard; i++) {
-            if (listCardOnMarket[i].seller == _userAddress) count++;
-        }
-
-        CardMarketItem[] memory results = new CardMarketItem[](count);
-        for (uint256 i = 0; i < _totalCard; i++) {
-            if (listCardOnMarket[i].seller == _userAddress) {
-                results[j] = listCardOnMarket[i];
-                j++;
-            }
-        }
-        return results;
-    }
-
-    function getListCardOnMarket(uint256 _totalCard)
-        external
-        view
-        returns (CardMarketItem[] memory)
-    {
-        uint256 count = 0;
-        uint256 j = 0;
-        for (uint256 i = 0; i < _totalCard; i++) {
-            if (listCardOnMarket[i].keeper == address(this)) count++;
-        }
-
-        CardMarketItem[] memory results = new CardMarketItem[](count);
-        for (uint256 i = 0; i < _totalCard; i++) {
-            if (listCardOnMarket[i].keeper == address(this)) {
-                results[j] = listCardOnMarket[i];
-                j++;
-            }
-        }
-        return results;
+    function getListItemOnMarket() external view returns (MarketItem[] memory) {
+        return listItemOnMarket;
     }
 }

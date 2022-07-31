@@ -132,7 +132,7 @@ export default function HandleCardOfUser({
                         variant="primary"
                         onClick={async () => {
                           await marketplaceService.methods
-                            ._updatePrice(card.id, newPrice)
+                            ._update(card.id, newPrice, 1)
                             .send({ from: userAddress });
                           setShow(false);
                           window.location.reload();
