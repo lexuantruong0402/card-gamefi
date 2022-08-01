@@ -1,5 +1,5 @@
 export const Contract_address_gameItems =
-  "0xAC0c9A1bE9C5EB79481552b7805375B9846288B8";
+  "0x4Bb6F4d8160AC565C34BFc91dB5fD88a52B84db9";
 export const Contract_abi_gameItems = [
   {
     inputs: [],

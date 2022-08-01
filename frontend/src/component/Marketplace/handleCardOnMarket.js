@@ -40,7 +40,7 @@ export default function HandleCardOnMarket({
                   <Button
                     onClick={async () => {
                       await marketplaceService.methods
-                        ._buyItem(card.id, 1, card.seller)
+                        ._buyItem(card.marketId, 1)
                         .send({
                           from: userAddress,
                           value: card.price * 1e18,

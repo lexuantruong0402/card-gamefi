@@ -15,16 +15,21 @@ import {
 import "./marketplace.css";
 import HandleCardOfUser from "./handleCardOfUser";
 import HandleCardOnMarket from "./handleCardOnMarket";
+import { normalEggId, rareEggId } from "../Egg/egg";
+import HandleEggOfUser from "./handleEggOfUser";
+import HandleEggOnMarket from "./handleEggOnMarket";
+import { Row, Col, Button } from "react-bootstrap";
 
 function coverToObject(infoOnMarket, infoOnCardService) {
   const cardIdsUser = [];
 
   infoOnMarket.forEach((e) => {
     const ob = {
-      id: e[0],
-      price: e[1],
-      seller: e[3],
-      dna: infoOnCardService.find((elm) => elm[0] === e[0])[1],
+      marketId: e.marketId,
+      id: e.itemId,
+      price: e.price,
+      seller: e.seller,
+      dna: infoOnCardService.find((elm) => elm.id === e.itemId).dna,
     };
 
     cardIdsUser.push(ob);
@@ -35,6 +40,8 @@ function coverToObject(infoOnMarket, infoOnCardService) {
 function ShowMarketPlace({ userAddress, web3Connect }) {
   const [infoCardOnMarketOfUser, setInfoCardOnMarketOfUser] = useState([]);
   const [infoCardOnMarket, setInfoCardOnMarket] = useState([]);
+  const [eggOnMarket, setEggOnMarket] = useState([]);
+  const [tab, setTab] = useState("card");
 
   const marketplaceService = new web3Connect.eth.Contract(
     // @ts-ignore
@@ -58,11 +65,11 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
       .call();
 
     const listCardOnMarket = listItemOnMarket.filter(
-      (item) => item[0] !== "1022" && item[0] !== "1021"
+      (item) => item.itemId !== "1022" && item.itemId !== "1021"
     );
 
     const listCardOnMarketInfo = await cardService.methods
-      .getInfoCard(listCardOnMarket.map((e) => e[0]))
+      .getInfoCard(listCardOnMarket.map((e) => e.itemId))
       .call();
 
     const listCardOnMarketWithInfo = coverToObject(
@@ -77,6 +84,14 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
     setInfoCardOnMarket(
       listCardOnMarketWithInfo.filter((elm) => elm.seller !== userAddress)
     );
+
+    const listEggOnMarket = listItemOnMarket.filter(
+      (item) =>
+        item.itemId === normalEggId.toString() ||
+        item.itemId === rareEggId.toString()
+    );
+
+    setEggOnMarket(listEggOnMarket);
   };
 
   useEffect(() => {
@@ -100,16 +115,109 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
 
   return (
     <>
-      <HandleCardOfUser
-        infoCardOnMarketOfUser={infoCardOnMarketOfUser}
-        marketplaceService={marketplaceService}
-        userAddress={userAddress}
-      ></HandleCardOfUser>
-      <HandleCardOnMarket
-        infoCardOnMarket={infoCardOnMarket}
-        marketplaceService={marketplaceService}
-        userAddress={userAddress}
-      ></HandleCardOnMarket>
+      <Row>
+        <Col
+          className="d-flex justify-content-center"
+          style={{ padding: "5 5 5 5" }}
+        >
+          <Button
+            variant="primary"
+            onClick={() => {
+              setTab("card");
+            }}
+          >
+            <span className="button-text-before-click"> Cards </span>
+          </Button>
+        </Col>
+        <Col
+          className="d-flex justify-content-center"
+          style={{ padding: "5 5 5 5" }}
+        >
+          <Button
+            variant="info"
+            onClick={() => {
+              setTab("egg");
+            }}
+          >
+            <span className="button-text-before-click"> Eggs </span>
+          </Button>
+        </Col>
+      </Row>
+      {tab === "card" ? (
+        <>
+          <div>
+            <h1
+              style={{
+                color: "white",
+                textAlign: "center",
+                marginBottom: "20px",
+                marginTop: "20px",
+              }}
+            >
+              You are selling
+            </h1>
+            <HandleCardOfUser
+              infoCardOnMarketOfUser={infoCardOnMarketOfUser}
+              marketplaceService={marketplaceService}
+              userAddress={userAddress}
+            ></HandleCardOfUser>
+          </div>
+          <div>
+            <h1
+              style={{
+                color: "white",
+                textAlign: "center",
+                marginBottom: "20px",
+                marginTop: "20px",
+              }}
+            >
+              Another user are selling
+            </h1>
+            <HandleCardOnMarket
+              infoCardOnMarket={infoCardOnMarket}
+              marketplaceService={marketplaceService}
+              userAddress={userAddress}
+            ></HandleCardOnMarket>{" "}
+          </div>
+        </>
+      ) : (
+        <>
+          <div>
+            <h1
+              style={{
+                color: "white",
+                textAlign: "center",
+                marginBottom: "20px",
+                marginTop: "20px",
+              }}
+            >
+              You are selling
+            </h1>
+            <HandleEggOfUser
+              infoEgg={eggOnMarket}
+              marketplaceService={marketplaceService}
+              userAddress={userAddress}
+            ></HandleEggOfUser>
+          </div>
+          <div>
+            <h1
+              style={{
+                color: "white",
+                textAlign: "center",
+                marginBottom: "20px",
+                marginTop: "20px",
+              }}
+            >
+              Another user are selling
+            </h1>
+            <HandleEggOnMarket
+              infoEgg={eggOnMarket}
+              marketplaceService={marketplaceService}
+              userAddress={userAddress}
+            ></HandleEggOnMarket>
+          </div>
+        </>
+      )}
     </>
   );
 }

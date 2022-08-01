@@ -1,5 +1,5 @@
 export const Contract_address_cardService =
-  "0x96141D899729D0AAE41a8176E5B8D6f2390dDd63";
+  "0xFd431511E24ecb94dF7660Ad1a6B36A09c26318c";
 export const Contract_abi_cardService = [
   {
     anonymous: false,

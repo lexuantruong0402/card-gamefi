@@ -1,5 +1,5 @@
 export const Contract_address_eggService =
-  "0x164704B303b99dA07376ca4ba3ad8b43E5704718";
+  "0xa4890a19b294d96f6B30651d4F90addACCbEfd73";
 export const Contract_abi_eggService = [
   {
     anonymous: false,

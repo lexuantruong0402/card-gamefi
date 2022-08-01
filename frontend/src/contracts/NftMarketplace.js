@@ -1,5 +1,5 @@
 export const Contract_address_marketplace =
-  "0x69830f416A8C78d6aB0F8e798bbC00bEe8a3490e";
+  "0xfe886D3bB44b296F2e226235117F79186420457F";
 export const Contract_abi_marketplace = [
   {
     anonymous: false,
@@ -92,18 +92,13 @@ export const Contract_abi_marketplace = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_itemId",
+        name: "_marketId",
         type: "uint256",
       },
       {
         internalType: "uint256",
         name: "_amount",
         type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_seller",
-        type: "address",
       },
     ],
     name: "_buyItem",
@@ -115,13 +110,32 @@ export const Contract_abi_marketplace = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_itemId",
+        name: "_marketId",
         type: "uint256",
       },
     ],
     name: "_cancelItemListed",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_marketId",
+        type: "uint256",
+      },
+    ],
+    name: "_findItem",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -177,7 +191,7 @@ export const Contract_abi_marketplace = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_itemId",
+        name: "_marketId",
         type: "uint256",
       },
       {
@@ -204,7 +218,12 @@ export const Contract_abi_marketplace = [
         components: [
           {
             internalType: "uint256",
-            name: "id",
+            name: "marketId",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "itemId",
             type: "uint256",
           },
           {

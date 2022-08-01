@@ -33,7 +33,7 @@ function ShowTab({ setTab }) {
                             setTab("egg");
                         }}
                     >
-                        <span className="button-text-before-click"> Egg </span>
+                        <span className="button-text-before-click"> Eggs </span>
                     </Button>
                 </Col>
                 <Col

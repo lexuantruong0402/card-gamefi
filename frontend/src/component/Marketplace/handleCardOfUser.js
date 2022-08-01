@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -74,6 +74,7 @@ export default function HandleCardOfUser({
 }) {
   const infoCard = infoCardOnMarketOfUser;
   const [show, setShow] = useState(false);
+  const [marketId, setMarketId] = useState(0);
   let newPrice;
   const handleUpdatePrice = (e) => {
     newPrice = e.target.value;
@@ -103,7 +104,13 @@ export default function HandleCardOfUser({
 
                 {/* show button update price */}
                 <div style={{ textAlign: "center", marginTop: "2px" }}>
-                  <Button variant="warning" onClick={() => setShow(true)}>
+                  <Button
+                    variant="warning"
+                    onClick={() => {
+                      setShow(true);
+                      setMarketId(card.marketId);
+                    }}
+                  >
                     Update price
                   </Button>
 
@@ -132,7 +139,7 @@ export default function HandleCardOfUser({
                         variant="primary"
                         onClick={async () => {
                           await marketplaceService.methods
-                            ._update(card.id, newPrice, 1)
+                            ._update(marketId, newPrice, 1)
                             .send({ from: userAddress });
                           setShow(false);
                           window.location.reload();
@@ -148,7 +155,7 @@ export default function HandleCardOfUser({
                     variant="danger"
                     onClick={async () => {
                       await marketplaceService.methods
-                        ._cancelItemListed(card.id)
+                        ._cancelItemListed(card.marketId)
                         .send({ from: userAddress });
                       window.location.reload();
                     }}

@@ -21,7 +21,8 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
     );
 
     struct MarketItem {
-        uint256 id;
+        uint256 marketId;
+        uint256 itemId;
         uint256 price;
         uint256 amount;
         address seller;
@@ -31,6 +32,7 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
     address nftAddress;
     address cardAddress;
     uint8 fee = 10;
+    uint256 marketId = 0;
 
     MarketItem[] listItemOnMarket;
 
@@ -47,24 +49,15 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         nftAddress = _nftAddress;
     }
 
-    function _findItem(uint256 _itemId, address _seller)
-        internal
-        view
-        returns (MarketItem memory, uint256)
-    {
-        MarketItem memory middle;
+    function _findItem(uint256 _marketId) public view returns (uint256) {
         uint256 index;
         for (uint256 i = 0; i < listItemOnMarket.length; i++) {
-            if (
-                listItemOnMarket[i].id == _itemId &&
-                listItemOnMarket[i].seller == _seller
-            ) {
-                middle = listItemOnMarket[i];
+            if (listItemOnMarket[i].marketId == _marketId) {
                 index = i;
-                break;
+                return (index);
             }
         }
-        return (middle, index);
+        return (index + 1);
     }
 
     function _deleteFromListItemOnMarket(uint256 _index) internal {
@@ -80,9 +73,19 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         uint256 _amount
     ) external checkPrice(_price) {
         IERC1155 nft = IERC1155(nftAddress);
+
         listItemOnMarket.push(
-            MarketItem(_itemId, _price, _amount, msg.sender, address(this))
+            MarketItem(
+                marketId,
+                _itemId,
+                _price,
+                _amount,
+                msg.sender,
+                address(this)
+            )
         );
+        marketId++;
+
         nft.safeTransferFrom(
             msg.sender,
             address(this),
@@ -90,6 +93,7 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
             _amount,
             "0x0"
         );
+
         emit MarketItemCreated(
             _itemId,
             _price,
@@ -99,36 +103,38 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         );
     }
 
-    function _cancelItemListed(uint256 _itemId) external {
+    function _cancelItemListed(uint256 _marketId) external {
         IERC1155 nft = IERC1155(nftAddress);
-        MarketItem memory middle;
+
         uint256 index;
-        (middle, index) = _findItem(_itemId, msg.sender);
+        (index) = _findItem(_marketId);
+        MarketItem memory middle = listItemOnMarket[index];
         _deleteFromListItemOnMarket(index);
+
         nft.safeTransferFrom(
             address(this),
             msg.sender,
-            _itemId,
+            middle.itemId,
             middle.amount,
             "0x0"
         );
     }
 
     function _update(
-        uint256 _itemId,
+        uint256 _marketId,
         uint256 _newPrice,
-        uint256 _newAmount
-    ) external // check new amount > 0
-    {
+        uint256 _newAmount // check new amount > 0
+    ) external {
         IERC1155 nft = IERC1155(nftAddress);
-        MarketItem memory middle;
+
         uint256 index;
-        (middle, index) = _findItem(_itemId, msg.sender);
+        (index) = _findItem(_marketId);
+        MarketItem memory middle = listItemOnMarket[index];
         if (listItemOnMarket[index].amount > _newAmount)
             nft.safeTransferFrom(
                 address(this),
                 msg.sender,
-                _itemId,
+                middle.itemId,
                 middle.amount - _newAmount,
                 "0x0"
             );
@@ -137,7 +143,7 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
             nft.safeTransferFrom(
                 msg.sender,
                 address(this),
-                _itemId,
+                middle.itemId,
                 _newAmount - middle.amount,
                 "0x0"
             );
@@ -146,15 +152,12 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         listItemOnMarket[index].price = _newPrice;
     }
 
-    function _buyItem(
-        uint256 _itemId,
-        uint256 _amount,
-        address _seller
-    ) external payable {
+    function _buyItem(uint256 _marketId, uint256 _amount) external payable {
         IERC1155 nft = IERC1155(nftAddress);
-        MarketItem memory middle;
+
         uint256 index;
-        (middle, index) = _findItem(_itemId, _seller);
+        (index) = _findItem(_marketId);
+        MarketItem memory middle = listItemOnMarket[index];
 
         uint256 _cardPriceToWei = middle.price * 1e18 * _amount;
         require(msg.value >= _cardPriceToWei);
@@ -169,14 +172,14 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         nft.safeTransferFrom(
             address(this),
             msg.sender,
-            _itemId,
+            middle.itemId,
             _amount,
             "0x0"
         );
         if (_amount == middle.amount) _deleteFromListItemOnMarket(index);
         else (listItemOnMarket[index].amount = middle.amount - _amount);
 
-        emit ItemBought(_itemId, _amount, middle.seller, msg.sender);
+        emit ItemBought(middle.itemId, _amount, middle.seller, msg.sender);
     }
 
     function getListItemOnMarket() external view returns (MarketItem[] memory) {
