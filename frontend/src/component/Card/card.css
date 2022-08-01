@@ -38,6 +38,12 @@
   width: 200px;
 }
 
+.img-wings {
+  z-index: 7;
+  height: 200px;
+  width: 200px;
+}
+
 .countdown-battle {
   color: aliceblue;
   font-size: 30px;

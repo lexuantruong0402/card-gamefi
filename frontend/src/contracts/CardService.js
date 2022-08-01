@@ -1,5 +1,5 @@
 export const Contract_address_cardService =
-  "0xFd431511E24ecb94dF7660Ad1a6B36A09c26318c";
+  "0x484738A869D8A3035F8b0A44D84eeB03F0a44ce0";
 export const Contract_abi_cardService = [
   {
     anonymous: false,
@@ -152,6 +152,11 @@ export const Contract_abi_cardService = [
         internalType: "address",
         name: "_sender",
         type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "_typeEgg",
+        type: "bool",
       },
     ],
     name: "_userCreateCard",

@@ -12,7 +12,7 @@ import Countdown from "react-countdown";
 
 export function dnaToPartOfImage(dna) {
   const partArray = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     partArray.push(dna % 100);
     dna = Math.floor(dna / 100);
   }
@@ -25,6 +25,7 @@ export const brows = 2;
 export const eyes = 17;
 export const mouth = 2;
 export const accessories = 12;
+export const wings = 6;
 
 const handleFight = async (
   cardService,
@@ -121,6 +122,11 @@ export default function HandleCard({
                     alt="accessories"
                     className="img-nft img-accessories"
                     src={`/images/accessories/${parts[5] % accessories}.png`}
+                  ></img>
+                  <img
+                    alt="wings"
+                    className="img-nft img-wings"
+                    src={`/images/wings/${parts[6] % wings}.png`}
                   ></img>
                 </div>
                 <p

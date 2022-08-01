@@ -21,7 +21,7 @@ interface IGameItems is IERC1155 {
 }
 
 interface ICardService {
-    function _userCreateCard(address _sender) external;
+    function _userCreateCard(address _sender, bool _eggType) external;
 }
 
 contract EggService is Ownable {
@@ -62,10 +62,13 @@ contract EggService is Ownable {
         ICardService card = ICardService(cardServiceAddress);
         IGameItems nft = IGameItems(gameItemAddress);
 
-        card._userCreateCard(msg.sender);
-        if (_eggType == nft.getCommonEggId())
+        if (_eggType == nft.getCommonEggId()) {
+            card._userCreateCard(msg.sender, true);
             nft.userBurnEgg(msg.sender, _eggType, amountNeedToOpenCommonEgg);
-        if (_eggType == nft.getRareEggId())
+        }
+        if (_eggType == nft.getRareEggId()) {
+            card._userCreateCard(msg.sender, false);
             nft.userBurnEgg(msg.sender, _eggType, amountNeedToOpenRareEgg);
+        }
     }
 }

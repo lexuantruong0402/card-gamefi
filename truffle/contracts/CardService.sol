@@ -74,14 +74,21 @@ contract CardService is Ownable {
         emit NewCard(id, dna);
     }
 
-    function _userCreateCard(address _sender) external {
+    function _userCreateCard(address _sender, bool _typeEgg) external {
         require(
             msg.sender == eggServiceAddress,
             "not call from smart contract"
         );
 
         IGameItems nft = IGameItems(gameItemAddress);
-        uint256 dna = _random(dnaMod);
+        uint256 dna;
+        if (_typeEgg) {
+            dna = _random(dnaMod);
+            dna = dna * 100;
+        } else {
+            dna = _random(dnaMod);
+            if (dna % 100 == 0) dna = dna * 100 + 1;
+        }
         uint256 id = listCard.length;
         listCard.push(Card(id, dna, uint32(block.timestamp + cooldownTime)));
 
