@@ -18,14 +18,13 @@ export default function HandleEggOnMarket({
   const eggOnMarket = infoEgg.filter((egg) => egg.seller !== userAddress);
   const [show, setShow] = useState(false);
   let amountBuy = 0;
-  console.log(infoEgg);
+  const [marketIdEgg, setMarketIdEgg] = useState(0);
+  const [eggPriceUserBuy, setEggPriceUserBuy] = useState(0);
 
   return (
     <Container>
       <Row>
         {eggOnMarket.map((egg) => {
-          console.log(egg);
-
           return (
             <Col
               key={`${Math.random()}`}
@@ -47,11 +46,14 @@ export default function HandleEggOnMarket({
 
               <div>
                 <p style={{ color: "white" }}>
-                  Price: {egg.price} -- Amount: {egg.amount}
+                  Price: {egg.price / 1e18}
+                  <br></br> Amount: {egg.amount}
                 </p>
                 <div>
                   <Button
                     onClick={() => {
+                      setMarketIdEgg(egg.marketId);
+                      setEggPriceUserBuy(egg.price);
                       setShow(true);
                     }}
                   >
@@ -84,11 +86,12 @@ export default function HandleEggOnMarket({
                       </Button>
                       <Button
                         onClick={async () => {
+                          console.log(marketIdEgg, amountBuy);
                           await marketplaceService.methods
-                            ._buyItem(egg.itemId, amountBuy)
+                            ._buyItem(marketIdEgg, amountBuy)
                             .send({
                               from: userAddress,
-                              value: egg.price * 1e18 * amountBuy,
+                              value: eggPriceUserBuy * amountBuy,
                             });
                           window.location.reload();
                         }}

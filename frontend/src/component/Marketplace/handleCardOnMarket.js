@@ -30,7 +30,10 @@ export default function HandleCardOnMarket({
                     textAlign: "center",
                   }}
                 >
-                  dna: {card.dna} -- price: {card.price}
+                  <p>
+                    dna: {card.dna} <br></br>
+                    price: {card.price / 1e18} ETH
+                  </p>
                 </div>
                 <div
                   style={{
@@ -43,7 +46,7 @@ export default function HandleCardOnMarket({
                         ._buyItem(card.marketId, 1)
                         .send({
                           from: userAddress,
-                          value: card.price * 1e18,
+                          value: card.price,
                         });
                       window.location.reload();
                     }}

@@ -41,18 +41,25 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         _;
     }
 
-    function _setNftAddress(address _nftAddress) external {
+    function _setNftAddress(address _nftAddress) external onlyOwner {
         nftAddress = _nftAddress;
     }
 
-    function _setCardAddress(address _nftAddress) external {
+    function _setCardAddress(address _nftAddress) external onlyOwner {
         nftAddress = _nftAddress;
     }
 
-    function _findItem(uint256 _marketId) public view returns (uint256) {
+    function _findItem(uint256 _marketId, address _seller)
+        public
+        view
+        returns (uint256)
+    {
         uint256 index;
         for (uint256 i = 0; i < listItemOnMarket.length; i++) {
-            if (listItemOnMarket[i].marketId == _marketId) {
+            if (
+                listItemOnMarket[i].marketId == _marketId &&
+                listItemOnMarket[i].seller == _seller
+            ) {
                 index = i;
                 return (index);
             }
@@ -73,6 +80,7 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         uint256 _amount
     ) external checkPrice(_price) {
         IERC1155 nft = IERC1155(nftAddress);
+        require(nft.balanceOf(msg.sender, _itemId) >= _amount, "not enough");
 
         listItemOnMarket.push(
             MarketItem(
@@ -107,8 +115,10 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         IERC1155 nft = IERC1155(nftAddress);
 
         uint256 index;
-        (index) = _findItem(_marketId);
+        (index) = _findItem(_marketId, msg.sender);
+        require(index < listItemOnMarket.length, "Cannot find item on market");
         MarketItem memory middle = listItemOnMarket[index];
+
         _deleteFromListItemOnMarket(index);
 
         nft.safeTransferFrom(
@@ -128,8 +138,10 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
         IERC1155 nft = IERC1155(nftAddress);
 
         uint256 index;
-        (index) = _findItem(_marketId);
+        (index) = _findItem(_marketId, msg.sender);
+        require(index < listItemOnMarket.length, "Cannot find item on market");
         MarketItem memory middle = listItemOnMarket[index];
+
         if (listItemOnMarket[index].amount > _newAmount)
             nft.safeTransferFrom(
                 address(this),
@@ -140,26 +152,36 @@ contract NFTMarketplace is ERC1155Holder, Ownable {
             );
 
         if (listItemOnMarket[index].amount < _newAmount)
-            nft.safeTransferFrom(
-                msg.sender,
-                address(this),
-                middle.itemId,
-                _newAmount - middle.amount,
-                "0x0"
+            require(
+                nft.balanceOf(msg.sender, middle.itemId) >
+                    _newAmount - middle.amount,
+                "not enough item"
             );
+        nft.safeTransferFrom(
+            msg.sender,
+            address(this),
+            middle.itemId,
+            _newAmount - middle.amount,
+            "0x0"
+        );
 
         listItemOnMarket[index].amount = _newAmount;
         listItemOnMarket[index].price = _newPrice;
     }
 
-    function _buyItem(uint256 _marketId, uint256 _amount) external payable {
+    function _buyItem(
+        uint256 _marketId,
+        uint256 _amount,
+        address _seller
+    ) external payable {
         IERC1155 nft = IERC1155(nftAddress);
 
         uint256 index;
-        (index) = _findItem(_marketId);
+        (index) = _findItem(_marketId, _seller);
+        require(index < listItemOnMarket.length, "Cannot find item on market");
         MarketItem memory middle = listItemOnMarket[index];
 
-        uint256 _cardPriceToWei = middle.price * 1e18 * _amount;
+        uint256 _cardPriceToWei = middle.price * _amount;
         require(msg.value >= _cardPriceToWei);
         uint256 _changeMoney = msg.value - _cardPriceToWei;
         uint256 _ownerEarn = (_cardPriceToWei * fee) / 100;

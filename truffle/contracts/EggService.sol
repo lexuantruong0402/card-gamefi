@@ -58,7 +58,7 @@ contract EggService is Ownable {
         cardServiceAddress = _address;
     }
 
-    function _openEgg(uint256 _eggType) external {
+    function _openEgg(uint256 _eggType) external checkAmount(_eggType) {
         ICardService card = ICardService(cardServiceAddress);
         IGameItems nft = IGameItems(gameItemAddress);
 

@@ -16,6 +16,7 @@ export function dnaToPartOfImage(dna) {
     partArray.push(dna % 100);
     dna = Math.floor(dna / 100);
   }
+
   return partArray.reverse();
 }
 
@@ -39,7 +40,7 @@ const handleFight = async (
     ._battle(idfight)
     .send({ from: userAddress });
   const result = response.events.FightResult.returnValues;
-
+  console.log(result);
   if (result[1] > 50) {
     setWin(true);
     if (result[2] > 30) setNormalEgg(true);
@@ -282,7 +283,7 @@ export default function HandleCard({
                         <InputGroup.Text>$</InputGroup.Text>
                         <Form.Control
                           type="number"
-                          min="0.1"
+                          min="0"
                           onChange={handleSubmitSell}
                         />
                       </InputGroup>
@@ -300,7 +301,11 @@ export default function HandleCard({
                         variant="primary"
                         onClick={async () => {
                           await marketplaceService.methods
-                            ._sellItem(sellCard, sellPrice, 1)
+                            ._sellItem(
+                              sellCard,
+                              (sellPrice * 1e18).toString(),
+                              1
+                            )
                             .send({ from: userAddress });
                           handleClose();
                         }}

@@ -99,7 +99,10 @@ export default function HandleCardOfUser({
                     textAlign: "center",
                   }}
                 >
-                  dna: {card.dna} -- price: {card.price}
+                  <p>
+                    dna: {card.dna} <br></br>
+                    price: {card.price / 1e18} ETH
+                  </p>
                 </div>
 
                 {/* show button update price */}
@@ -139,7 +142,7 @@ export default function HandleCardOfUser({
                         variant="primary"
                         onClick={async () => {
                           await marketplaceService.methods
-                            ._update(marketId, newPrice, 1)
+                            ._update(marketId, (newPrice * 1e18).toString(), 1)
                             .send({ from: userAddress });
                           setShow(false);
                           window.location.reload();

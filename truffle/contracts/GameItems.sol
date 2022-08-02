@@ -8,6 +8,7 @@ contract GameItems is ERC1155, Ownable {
     // egg properties
     uint256 constant CommonEgg = 2**10 - 2;
     uint256 constant RareEgg = 2**10 - 3;
+    address CardService;
 
     constructor() ERC1155("") {}
 
@@ -16,11 +17,17 @@ contract GameItems is ERC1155, Ownable {
         _;
     }
 
+    function _setCardServiceAddress(address _cardService) external onlyOwner {
+        CardService = _cardService;
+    }
+
     function userMintCard(address _sender, uint256 _id) external {
+        require(msg.sender == CardService, "no permission");
         _mint(_sender, _id, 1, "");
     }
 
     function userMintEgg(address _sender, uint256 _typeEgg) external {
+        require(msg.sender == CardService, "no permission");
         _mint(_sender, _typeEgg, 1, "");
     }
 

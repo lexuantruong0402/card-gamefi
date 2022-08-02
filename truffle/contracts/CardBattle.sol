@@ -19,10 +19,6 @@ contract CardBattle is CardService {
         listCard[_cardId].readyTime = uint32(block.timestamp + cooldownTime);
     }
 
-    function _randomEnemy() external returns (Card memory) {
-        return (listCard[_random(listCard.length)]);
-    }
-
     function _battle(uint256 _cardId)
         external
         checkCooldown(_cardId)

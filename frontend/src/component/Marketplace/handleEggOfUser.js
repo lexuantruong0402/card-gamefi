@@ -54,7 +54,7 @@ function UpdateButton({ marketId, marketplaceService, userAddress }) {
             onClick={async () => {
               console.log(marketId, newSellPrice, newAmount);
               await marketplaceService.methods
-                ._update(marketId, newSellPrice, newAmount)
+                ._update(marketId, (newSellPrice * 1e18).toString(), newAmount)
                 .send({ from: userAddress });
               setShowUpdateModal(false);
               window.location.reload();
@@ -100,7 +100,8 @@ export default function HandleEggOfUser({
 
               <div>
                 <p style={{ color: "white" }}>
-                  Price: {egg.price} -- Amount: {egg.amount}
+                  Price: {egg.price / 1e18}
+                  <br></br> Amount: {egg.amount}
                 </p>
                 <div>
                   <UpdateButton

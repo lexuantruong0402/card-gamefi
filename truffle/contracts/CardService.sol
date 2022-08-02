@@ -67,6 +67,7 @@ contract CardService is Ownable {
     function _createCard(address _sender) internal onlyOwner {
         IGameItems nft = IGameItems(gameItemAddress);
         uint256 dna = _random(dnaMod);
+        dna = dna * 100;
         uint256 id = listCard.length;
         listCard.push(Card(id, dna, uint32(block.timestamp + cooldownTime)));
 

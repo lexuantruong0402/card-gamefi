@@ -78,7 +78,7 @@ function SellEgg({ userAddress, marketplaceService, eggType }) {
             variant="primary"
             onClick={async () => {
               await marketplaceService.methods
-                ._sellItem(eggType, sellPrice, sellAmount)
+                ._sellItem(eggType, (sellPrice * 1e18).toString(), sellAmount)
                 .send({ from: userAddress });
               setShow(false);
               window.location.reload();
