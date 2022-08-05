@@ -65,7 +65,8 @@ function ShowMarketPlace({ userAddress, web3Connect }) {
       .call();
 
     const listCardOnMarket = listItemOnMarket.filter(
-      (item) => item.itemId !== "1022" && item.itemId !== "1021"
+      (item) =>
+        item.itemId !== "1022" && item.itemId !== "1021" && item.price > 0
     );
 
     const listCardOnMarketInfo = await cardService.methods

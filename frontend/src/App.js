@@ -7,6 +7,7 @@ import ShowTab from "./component/Tab/tab";
 import CardService from "./component/Card/card";
 import ShowEgg from "./component/Egg/egg";
 import ShowMarketPlace from "./component/Marketplace/marketplace";
+import Init from "./Init";
 
 function App() {
   const web3Connect = new Web3(Web3.givenProvider || "http://localhost:7545");
@@ -24,6 +25,7 @@ function App() {
 
   return (
     <Container>
+      <Init userAddress={account} web3Connect={web3Connect}></Init>
       <ShowTab setTab={setTab}></ShowTab>
       {tab === "card" && account !== "" ? (
         <CardService userAddress={account} web3Connect={web3Connect} />

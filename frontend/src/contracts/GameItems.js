@@ -1,5 +1,5 @@
 export const Contract_address_gameItems =
-  "0x262CC575CA82F647C9d36cb0Bfd76c386bf729c8";
+  "0x24AE3A3e5BBb39c3181D9e2dCaf661E09a50B256";
 export const Contract_abi_gameItems = [
   {
     inputs: [],
@@ -142,6 +142,19 @@ export const Contract_abi_gameItems = [
     ],
     name: "URI",
     type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_cardService",
+        type: "address",
+      },
+    ],
+    name: "_setCardServiceAddress",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [

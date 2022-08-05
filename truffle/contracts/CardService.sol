@@ -29,6 +29,8 @@ contract CardService is Ownable {
     struct Card {
         uint256 id;
         uint256 dna;
+        uint8 winRate;
+        uint8 upgrade;
         uint32 readyTime;
     }
     Card[] public listCard;
@@ -69,7 +71,9 @@ contract CardService is Ownable {
         uint256 dna = _random(dnaMod);
         dna = dna * 100;
         uint256 id = listCard.length;
-        listCard.push(Card(id, dna, uint32(block.timestamp + cooldownTime)));
+        listCard.push(
+            Card(id, dna, 50, 1, uint32(block.timestamp + cooldownTime))
+        );
 
         nft.userMintCard(_sender, id);
         emit NewCard(id, dna);
@@ -83,15 +87,20 @@ contract CardService is Ownable {
 
         IGameItems nft = IGameItems(gameItemAddress);
         uint256 dna;
+        uint256 id = listCard.length;
         if (_typeEgg) {
             dna = _random(dnaMod);
             dna = dna * 100;
+            listCard.push(
+                Card(id, dna, 50, 1, uint32(block.timestamp + cooldownTime))
+            );
         } else {
             dna = _random(dnaMod);
             if (dna % 100 == 0) dna = dna * 100 + 1;
+            listCard.push(
+                Card(id, dna, 60, 1, uint32(block.timestamp + cooldownTime))
+            );
         }
-        uint256 id = listCard.length;
-        listCard.push(Card(id, dna, uint32(block.timestamp + cooldownTime)));
 
         nft.userMintCard(_sender, id);
         emit NewCard(id, dna);
@@ -119,10 +128,6 @@ contract CardService is Ownable {
         return results;
     }
 
-    function getTotalCard() external view returns (uint256) {
-        return listCard.length;
-    }
-
     function getInfoCard(uint256[] memory _listIds)
         external
         view
@@ -135,5 +140,15 @@ contract CardService is Ownable {
             j++;
         }
         return results;
+    }
+
+    function deleteFromListCard(uint256 _cardId) internal {
+        for (uint256 i = 0; i < listCard.length; i++) {
+            if (listCard[i].id == _cardId) {
+                listCard[i] = listCard[listCard.length - 1];
+                listCard.pop();
+                break;
+            }
+        }
     }
 }
