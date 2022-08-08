@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Modal,
-  Row,
-} from "react-bootstrap";
+import React from "react";
+import { Button, Container } from "react-bootstrap";
 import {
   Contract_abi_gameItems,
   Contract_address_gameItems,

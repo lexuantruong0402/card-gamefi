@@ -9,6 +9,8 @@ interface IGameItems is IERC1155 {
 
     function userMintEgg(address _sender, uint256 _typeEgg) external;
 
+    function userBurnCard(uint256 _tokenId, address _sender) external;
+
     function getCommonEggId() external pure returns (uint256);
 
     function getRareEggId() external pure returns (uint256);
@@ -16,6 +18,7 @@ interface IGameItems is IERC1155 {
 
 contract CardService is Ownable {
     event NewCard(uint256 _id, uint256 _dna);
+    event UpgradeResult(uint256 _cardId, uint8 success);
 
     address gameItemAddress;
     address eggServiceAddress;
@@ -142,13 +145,28 @@ contract CardService is Ownable {
         return results;
     }
 
-    function deleteFromListCard(uint256 _cardId) internal {
-        for (uint256 i = 0; i < listCard.length; i++) {
-            if (listCard[i].id == _cardId) {
-                listCard[i] = listCard[listCard.length - 1];
-                listCard.pop();
-                break;
-            }
+    function upgrade(uint256 _cardId, uint256 _cardMaterial) external {
+        IGameItems nft = IGameItems(gameItemAddress);
+        require(nft.balanceOf(msg.sender, _cardId) == 1, "user not own card");
+        require(
+            nft.balanceOf(msg.sender, _cardMaterial) == 1,
+            "user not own material card"
+        );
+        require(
+            listCard[_cardMaterial].upgrade == listCard[_cardId].upgrade,
+            "card and material must have the same upgrade level"
+        );
+
+        uint8 checkSuccess = uint8(_random(100));
+
+        if (checkSuccess >= 50) {
+            listCard[_cardId].upgrade++;
+            listCard[_cardId].winRate = listCard[_cardId].winRate + 3;
         }
+
+        nft.userBurnCard(_cardMaterial, msg.sender);
+        delete listCard[_cardMaterial];
+
+        emit UpgradeResult(_cardId, checkSuccess);
     }
 }

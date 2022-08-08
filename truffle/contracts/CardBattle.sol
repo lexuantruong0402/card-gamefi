@@ -5,8 +5,6 @@ import "./CardService.sol";
 
 contract CardBattle is CardService {
     uint8 rareEggRate = 30;
-    uint8 winRateCommon = 50;
-    uint8 winRateRare = 60;
 
     event FightResult(uint256 cardId, uint8 checkWin, uint8 checkEgg);
 
@@ -27,10 +25,8 @@ contract CardBattle is CardService {
         IGameItems nft = IGameItems(gameItemAddress);
         uint8 checkWin = uint8(_random(100));
         uint8 checkEgg = uint8(_random(100));
-        uint256 winRate = winRateRare;
-        if (listCard[_cardId].dna % 100 == 0) winRate = winRateCommon;
 
-        if (checkWin >= winRate) {
+        if (checkWin <= listCard[_cardId].winRate) {
             if (checkEgg >= rareEggRate)
                 nft.userMintEgg(msg.sender, nft.getCommonEggId());
             else nft.userMintEgg(msg.sender, nft.getRareEggId());

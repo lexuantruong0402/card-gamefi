@@ -1,5 +1,5 @@
 export const Contract_address_gameItems =
-  "0x24AE3A3e5BBb39c3181D9e2dCaf661E09a50B256";
+  "0x703A5CD84874A30B40413D1bF410ee7853bd5a25";
 export const Contract_abi_gameItems = [
   {
     inputs: [],
@@ -407,6 +407,24 @@ export const Contract_abi_gameItems = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_sender",
+        type: "address",
+      },
+    ],
+    name: "userBurnCard",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

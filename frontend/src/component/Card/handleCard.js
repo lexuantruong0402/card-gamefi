@@ -9,6 +9,7 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import Countdown from "react-countdown";
+import UpgradeCard from "./upgradeCard";
 
 export function dnaToPartOfImage(dna) {
   const partArray = [];
@@ -40,7 +41,7 @@ const handleFight = async (
     ._battle(idfight)
     .send({ from: userAddress });
   const result = response.events.FightResult.returnValues;
-  console.log(result);
+
   if (result[1] > 50) {
     setWin(true);
     if (result[2] > 30) setNormalEgg(true);
@@ -75,8 +76,8 @@ export default function HandleCard({
     <Container className="d-flex justify-content-center">
       <Row>
         {listCard.map((card) => {
-          const parts = dnaToPartOfImage(Number(card[1]));
-          const coolDown = card[2];
+          const parts = dnaToPartOfImage(Number(card.dna));
+          const coolDown = card.readyTime;
           const now = Date.now();
 
           return (
@@ -133,11 +134,14 @@ export default function HandleCard({
                 <p
                   style={{
                     color: "white",
-                    marginLeft: "30px",
+                    marginLeft: "10px",
                     marginBottom: "0px",
                   }}
                 >
-                  dna: {card[1]}
+                  dna: {card.dna}
+                  <br></br>
+                  upgrade: {card.upgrade} -- winrate: {card.winRate}
+                  <br></br>
                 </p>
                 {Number(coolDown) * 1000 > now ? (
                   <Countdown
@@ -152,7 +156,7 @@ export default function HandleCard({
                         marginLeft: "60px",
                       }}
                       onClick={() => {
-                        handleFight(cardService, card[0], userAddress, setShow);
+                        handleFight(cardService, card.id, userAddress, setShow);
                       }}
                     >
                       Fight
@@ -170,7 +174,7 @@ export default function HandleCard({
                       onClick={() => {
                         handleFight(
                           cardService,
-                          card[0],
+                          card.id,
                           userAddress,
                           setShow,
                           setWin,
@@ -263,7 +267,7 @@ export default function HandleCard({
                     style={{ marginLeft: "30px", marginBottom: "20px" }}
                     onClick={() => {
                       setShowSell(true);
-                      setSellCard(card[0]);
+                      setSellCard(card.id);
                     }}
                   >
                     Sell this card
@@ -315,6 +319,13 @@ export default function HandleCard({
                     </Modal.Footer>
                   </Modal>
                 </div>
+
+                <UpgradeCard
+                  targetCard={card}
+                  listCard={listCard}
+                  cardService={cardService}
+                  userAddress={userAddress}
+                ></UpgradeCard>
               </div>
             </Col>
           );

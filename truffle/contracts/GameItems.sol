@@ -46,4 +46,8 @@ contract GameItems is ERC1155, Ownable {
     ) external {
         _burn(_sender, _typeEgg, _amount);
     }
+
+    function userBurnCard(uint256 _tokenId, address _sender) external {
+        _burn(_sender, _tokenId, 1);
+    }
 }

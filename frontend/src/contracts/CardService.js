@@ -1,5 +1,5 @@
 export const Contract_address_cardService =
-  "0x281912056Af121A5828595f2eFAb456Af21692c7";
+  "0x4dA06B18D8B66E878B730FcC23EF1A08aA47eef1";
 export const Contract_abi_cardService = [
   {
     anonymous: false,
@@ -65,6 +65,25 @@ export const Contract_abi_cardService = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_cardId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "success",
+        type: "uint8",
+      },
+    ],
+    name: "UpgradeResult",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -87,36 +106,6 @@ export const Contract_abi_cardService = [
     ],
     name: "_cardInit",
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "_randomEnemy",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "id",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "dna",
-            type: "uint256",
-          },
-          {
-            internalType: "uint32",
-            name: "readyTime",
-            type: "uint32",
-          },
-        ],
-        internalType: "struct CardService.Card",
-        name: "",
-        type: "tuple",
-      },
-    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -187,6 +176,16 @@ export const Contract_abi_cardService = [
             type: "uint256",
           },
           {
+            internalType: "uint8",
+            name: "winRate",
+            type: "uint8",
+          },
+          {
+            internalType: "uint8",
+            name: "upgrade",
+            type: "uint8",
+          },
+          {
             internalType: "uint32",
             name: "readyTime",
             type: "uint32",
@@ -223,6 +222,16 @@ export const Contract_abi_cardService = [
             type: "uint256",
           },
           {
+            internalType: "uint8",
+            name: "winRate",
+            type: "uint8",
+          },
+          {
+            internalType: "uint8",
+            name: "upgrade",
+            type: "uint8",
+          },
+          {
             internalType: "uint32",
             name: "readyTime",
             type: "uint32",
@@ -231,19 +240,6 @@ export const Contract_abi_cardService = [
         internalType: "struct CardService.Card[]",
         name: "",
         type: "tuple[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getTotalCard",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -268,6 +264,16 @@ export const Contract_abi_cardService = [
         internalType: "uint256",
         name: "dna",
         type: "uint256",
+      },
+      {
+        internalType: "uint8",
+        name: "winRate",
+        type: "uint8",
+      },
+      {
+        internalType: "uint8",
+        name: "upgrade",
+        type: "uint8",
       },
       {
         internalType: "uint32",
@@ -307,6 +313,24 @@ export const Contract_abi_cardService = [
       },
     ],
     name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_cardId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_cardMaterial",
+        type: "uint256",
+      },
+    ],
+    name: "upgrade",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

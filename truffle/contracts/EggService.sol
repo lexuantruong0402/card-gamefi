@@ -38,13 +38,13 @@ contract EggService is Ownable {
 
         if (_eggType == CommonEggId)
             require(
-                nft.balanceOf(msg.sender, CommonEggId) >
+                nft.balanceOf(msg.sender, CommonEggId) >=
                     amountNeedToOpenCommonEgg,
                 "not enough egg"
             );
         if (_eggType == RareEggId)
             require(
-                nft.balanceOf(msg.sender, RareEggId) > amountNeedToOpenRareEgg,
+                nft.balanceOf(msg.sender, RareEggId) >= amountNeedToOpenRareEgg,
                 "not enough egg"
             );
         _;

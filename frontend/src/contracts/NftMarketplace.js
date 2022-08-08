@@ -1,5 +1,5 @@
 export const Contract_address_marketplace =
-  "0xF711670ffEba6902A2E632731749650ac244EbaA";
+  "0x993aC42F51345a2D10966CBAbaf75Fbdc324fBfA";
 export const Contract_abi_marketplace = [
   {
     anonymous: false,

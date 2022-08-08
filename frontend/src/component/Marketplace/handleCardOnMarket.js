@@ -32,7 +32,9 @@ export default function HandleCardOnMarket({
                 >
                   <p>
                     dna: {card.dna} <br></br>
-                    price: {card.price / 1e18} ETH
+                    price: {card.price / 1e18} ETH <br></br>
+                    upgrade: {card.upgrade} <br></br>
+                    winrate: {card.winrate}
                   </p>
                 </div>
                 <div

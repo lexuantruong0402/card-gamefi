@@ -24,12 +24,16 @@ function coverToObject(infoOnMarket, infoOnCardService) {
   const cardIdsUser = [];
 
   infoOnMarket.forEach((e) => {
+    const card = infoOnCardService.find((elm) => elm.id === e.itemId);
+
     const ob = {
       marketId: e.marketId,
       id: e.itemId,
       price: e.price,
       seller: e.seller,
-      dna: infoOnCardService.find((elm) => elm.id === e.itemId).dna,
+      dna: card.dna,
+      upgrade: card.upgrade,
+      winrate: card.winRate,
     };
 
     cardIdsUser.push(ob);
